@@ -1,0 +1,62 @@
+/* Import font from google fonts */
+@import url('https://fonts.googleapis.com/css2?family=Anonymous+Pro&display=swap');
+
+html, body{
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+}
+body{
+    width: 75%;
+    margin: 0 auto;
+    color: white;
+    background-color: black;
+    font-family: 'Anonymous Pro', monospace;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 5rem 1fr;
+    grid-template-areas:
+        'Header'
+        'Main';
+}
+header{
+    grid-area: Header;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    box-shadow: 2px white;
+}
+main{
+    grid-area: Main;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 5rem;
+    grid-template-areas:
+        'messageBoard'
+        'form';
+}
+h1{
+    margin: 0;
+}
+#messageBoard{
+    overflow-y: scroll;}
+.time{
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 1rem;
+}
+input{
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    outline: none;
+}
+input:hover{background-color: #bbbbbb;}
+
+
+/* In case the display device is portrait/a phone */
+@media (orientation: portrait) {
+    body{width: 100%;}
+}
