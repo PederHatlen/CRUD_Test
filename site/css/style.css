@@ -1,5 +1,5 @@
 /* Import font from google fonts */
-@import url('https://fonts.googleapis.com/css2?family=Anonymous+Pro&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@200;400&display=swap');
 
 html, body{
     margin: 0;
@@ -12,24 +12,26 @@ body{
     margin: 0 auto;
     color: white;
     background-color: black;
-    font-family: 'Anonymous Pro', monospace;
+    font-family: 'Roboto Mono', monospace;
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 5rem 1fr 5rem;
     grid-template-areas:
         'Header'
         'Messageboard'
-        'Form';
+        'Footer';
 }
 header{
     grid-area: Header;
     display: flex;
     align-items: center;
     padding: 0 20px;
-    box-shadow: 2px white;
 }
-h1{margin: 0;}
-
+h1{
+    margin: 0;
+    font-weight: 200;
+    font-size: 2.5rem;
+}
 
 #messageBoard{
     grid-area: Messageboard;
@@ -52,20 +54,30 @@ h1{margin: 0;}
 .deleteBTN:hover{color: #ff2222;}
 .editBTN:hover{color: #2222ff}
 
-#sendMSG{
-    grid-area: Form;
+footer{
+    grid-area: Footer;
+    padding: 0 20px;
     display: flex;
     align-items: center;
-    padding: 0 20px;
-    box-shadow: 2px white;
+    justify-content: space-between;
+}
+footer span{
+    font-weight: 200;
+    font-size: 1.25rem;
+}
+#sendMSG{
+    display: flex;
+    align-items: center;
 }
 input[type=text], input[type=submit]{
     font-size: 1rem;
     font-weight: bold;
     border: none;
+    border-right: #aaa 1px solid;
     outline: none;
 }
 input:hover, input:focus{background-color: #bbbbbb;}
+::placeholder{color: #000;}
 
 #deleteMSG{display: none;}
 #editFormWrapper{
@@ -84,6 +96,7 @@ input:hover, input:focus{background-color: #bbbbbb;}
     background: black;
     border: white 2px solid;
 }
+#editMSG h2{margin-top: 0;}
 
 
 /* Scrollbar (Only works in webkit (Everything chrome/safari based)) */
