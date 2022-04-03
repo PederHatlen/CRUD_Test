@@ -41,6 +41,7 @@
     }else{
         // If the user didn't come here by post they get a surprise
         header("location: https://youtu.be/dQw4w9WgXcQ");
+        exit;
     }
 
     header("location: ../index.php");
