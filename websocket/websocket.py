@@ -1,6 +1,7 @@
 import asyncio
 import time
 import socket
+from tokenize import Number
 import websockets
 import json
 import MySQLdb
@@ -22,25 +23,52 @@ async def handler(websocket):
 		while websocket.open:
 			try:
 				data = json.loads(await websocket.recv())
-				print(input)
-				message = data["message"]
-				uuid = data["uuid"]
-				if len(message) != 0:
-					cursor.execute("""INSERT INTO messages (message, user) VALUES (%s, %s)""", [str(message), str(uuid)])
+
+				if data["request"] == "send":
+					if len(data["message"]) != 0:
+						cursor.execute("""INSERT INTO messages (message, user) VALUES (%s, %s)""", [str(data["message"]), str(data["uuid"])])
+						conn.commit()
+						messageId = cursor.lastrowid
+						unixtime = round(time.time() * 1000)
+						sendtTo = []
+						sendData = {
+							"action":"send",
+							"time": unixtime,
+							"uuid": data["uuid"],
+							"msg": data["message"],
+							"id": messageId
+						}
+						for i in connections:
+							await i.send(json.dumps(sendData))
+							sendtTo.append(colored(i.remote_address[0], "cyan"))
+						print(colored("Sendt to", "green"), colored(", ", "green").join(sendtTo))
+				elif data["request"] == "edit":
+					cursor.execute("""SELECT User FROM messages WHERE id = %d""", [Number(data["elementid"])])
 					conn.commit()
-					messageId = conn.insert_id()
-					unixtime = round(time.time() * 1000)
-					sendtTo = []
-					sendData = {
-						"time": unixtime,
-						"uuid": uuid,
-						"msg": message,
-						"id": messageId
-					}
-					for i in connections:
-						await i.send(json.dumps(sendData))
-						sendtTo.append(colored(websocket.remote_address[0], "cyan"))
-					print(colored("Sendt to", "green"), colored(", ", "green").join(sendtTo))
+					ress = cursor.fetchone()
+					if ress[0] == data["uuid"]:
+						cursor.execute("""UPDATE messages SET message = %s where id = %d""", [str(data["message"]), str(data["elementid"])])
+						conn.commit()
+						sendData = {
+							"action":"edit",
+							"msg": data["message"],
+							"id": data["elementid"]
+						}
+						for i in connections: await i.send(json.dumps(sendData))
+						print(userIP, colored("Edited", "blue"), data["elementid"])
+				elif data["request"] == "delete":
+					cursor.execute("""SELECT User FROM messages WHERE id = %s""", [str(data["elementid"])])
+					conn.commit()
+					ress = cursor.fetchone()
+					if ress[0] == data["uuid"]:
+						cursor.execute("""DELETE FROM messages WHERE id = %s""", [str(data["elementid"])])
+						conn.commit()
+						sendData = {
+							"action":"delete",
+							"id": data["elementid"]
+						}
+						for i in connections: await i.send(json.dumps(sendData))
+						print(userIP, colored("Deleted", "blue"), data["elementid"])
 			except websockets.exceptions.ConnectionClosed:
 				break
 			except Exception as err:
