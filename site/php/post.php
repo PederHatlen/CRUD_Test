@@ -2,12 +2,12 @@
     define("IS_INCLUDED", TRUE);
     include 'phpRepo.php';
 
-    if ($_SERVER['REQUEST_METHOD'] == "POST" and isset($_POST["form"])) {
+    if ($_SERVER['REQUEST_METHOD'] == "POST" and isset($_POST["request"])) {
 
         // Connection function is in phpRepo
         $con = connect();
 
-        switch ($_POST["form"]) {
+        switch ($_POST["request"]) {
             case 'send':
                 if (isset($_POST["message"]) and isset($_SESSION["uuid"]) and strlen(trim($_POST["message"]))>0){
                     // SQL-Injection proof SQL query
