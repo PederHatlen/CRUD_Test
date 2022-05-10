@@ -40,18 +40,18 @@ h1{
     height: 100%;
     padding: 0 20px;
 }
-.message{
+.messageWrapper{
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
 }
 .time{
     font-family: Arial, Helvetica, sans-serif;
     font-weight: bold;
     font-size: 1rem;
 }
-.deleteBTN, .editBTN{color: white;}
+.options{margin-left: auto;}
+.deleteBTN, .editBTN{color: white; text-decoration: none;}
 .deleteBTN:hover{color: #ff2222;}
 .editBTN:hover{color: #2222ff}
 
