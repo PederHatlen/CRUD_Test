@@ -13,6 +13,21 @@ async def handler(websocket):
 	userIP = colored("[{0}]".format(websocket.remote_address[0]), "magenta")
 	try:
 		global connections
+
+		initData = json.loads(await websocket.recv())
+		if initData["uuid"] == "":
+			print(userIP, colored("Incorrect init data.", "red"))
+			await websocket.close()
+			return False
+
+		cursor.execute("""SELECT ip FROM users WHERE uuid = %s and ip = %s """, [str(initData["uuid"]), str(websocket.remote_address[0])])
+		conn.commit()
+
+		if not cursor.rowcount:
+			print(userIP, colored("IP does not match UUID.", "red"))
+			await websocket.close()
+			return False
+
 		print(userIP, colored("Connected", "green"))
 		connections.append(websocket)
 	except Exception as err:
