@@ -40,6 +40,72 @@ function sanetize(s){
 	return e.innerHTML;
 }
 
+function renderMessage(data){
+	// let data = JSON.parse(rawdata);
+	console.log(data);
+	// console.log(uuid, data["uuid"], data["uuid"] == uuid)
+	switch (data["action"]) {
+		case "send":
+			console.log(data);
+			let messageWrapper = document.createElement("div");
+			messageWrapper.classList.add("messageWrapper");
+			messageWrapper.dataset.msgid = data["id"];
+			messageWrapper.dataset.uuid = data["uuid"];
+
+			let timeEl = document.createElement("span");
+			let time = new Date(data["time"]);
+			let ftime = ('00'+time.getDate()).slice(-2)+"."+('00'+(time.getMonth()+1)).slice(-2)+" "+('00'+time.getHours()).slice(-2)+":"+('00'+time.getMinutes()).slice(-2);
+			timeEl.classList.add("time");
+			timeEl.innerHTML = `[${ftime}]`;
+
+			let msgEl = document.createElement("span");
+			msgEl.id = `msg${data["id"]}`;
+			msgEl.innerHTML = sanetize(data["msg"]);
+
+			messageWrapper.append(timeEl);
+			messageWrapper.append(msgEl);
+
+			if (data["uuid"] == uuid) {
+				let optionsEl = document.createElement("div");
+				optionsEl.classList.add("options");
+
+				let editBTNEl = document.createElement("a");
+				editBTNEl.classList.add("material-icons")
+				editBTNEl.classList.add("editBTN");
+				editBTNEl.href = "#";
+				editBTNEl.onclick = ()=>{showEdit(data["id"], data["uuid"]);}
+				editBTNEl.innerHTML = "edit";
+
+				let deleteBTNEl = document.createElement("a");
+				deleteBTNEl.classList.add("material-icons")
+				deleteBTNEl.classList.add("deleteBTN");
+				deleteBTNEl.href = "#";
+				deleteBTNEl.onclick = ()=>{deleteMSG(data["id"], data["uuid"]);}
+				deleteBTNEl.innerHTML = "delete";
+
+				optionsEl.append(editBTNEl);
+				optionsEl.append(deleteBTNEl);
+
+				messageWrapper.append(optionsEl);
+			}
+			
+			messageBoardEl.append(messageWrapper);
+
+			messageBoardEl.scrollTop = messageBoardEl.scrollHeight;
+			break;
+		case "edit":
+			let elToBeedited = document.getElementById(`msg${data["id"]}`);
+			console.log(elToBeedited);
+			elToBeedited.innerHTML = sanetize(data["msg"]);
+			break;
+	
+		case "delete":
+			let deleteEl = document.querySelector(`[data-msgid="${data["id"]}"]`);
+			deleteEl.remove();
+			break;
+	}
+}
+
 socket.onopen = () => {
 	connectionInfoEL.innerHTML += "Connected!";
 	connectionInfoEL.style.backgroundColor = "green";
@@ -51,92 +117,31 @@ socket.onopen = () => {
 		Array.from(document.forms).map(e=>{e.onsubmit = null});
 		deleteMSG = ()=>{
 			deleteElementIdEl.value = id;
-			deleteElementUUIDEl.value = uuid;
-			deleteMSGFormEl.submit();
+			deleteUUIDInputEl.value = uuid;
+			deleteFormEl.submit();
 		}
 	}
-	Array.from(document.forms).map(form=>{
-		form.onsubmit = (e) => {
-			e.preventDefault();
-			sendForm(e.target)
-		}
-	});
+	sendFormEl.onsubmit = (e) => {
+		e.preventDefault();
+		sendMSGInputEl.value = "";
+		sendForm(e.target);
+	}
+	editFormEl.onsubmit = (e) => {
+		e.preventDefault();
+		editMSGInputEl.value = "";
+		sendForm(e.target);
+	}
 	
 	socket.onmessage = (e) => {
-		let data = JSON.parse(e.data);
-		// console.log(data);
-		// console.log(uuid, data["uuid"], data["uuid"] == uuid)
-		switch (data["action"]) {
-			case "send":
-				console.log(data);
-				let messageWrapper = document.createElement("div");
-				messageWrapper.classList.add("messageWrapper");
-				messageWrapper.dataset.msgid = data["id"];
-				messageWrapper.dataset.msgid = data["uuid"];
-
-				let time = new Date(data["time"]);
-				let ftime = ('00'+time.getDate()).slice(-2)+"."+('00'+(time.getMonth()+1)).slice(-2)+" "+('00'+time.getHours()).slice(-2)+":"+('00'+time.getMinutes()).slice(-2);
-				let timeEl = document.createElement("span");
-				timeEl.classList.add("time");
-				timeEl.innerHTML = `[${ftime}]`;
-
-				let msgEl = document.createElement("span");
-				msgEl.id = `msg${data["id"]}`;
-				msgEl.innerHTML = sanetize(data["msg"]);
-
-				messageWrapper.append(timeEl);
-				messageWrapper.append(msgEl);
-
-				if (data["uuid"] == uuid) {
-					let optionsEl = document.createElement("div");
-					optionsEl.classList.add("options");
-
-					let editBTNEl = document.createElement("a");
-					editBTNEl.classList.add("material-icons")
-					editBTNEl.classList.add("editBTN");
-					editBTNEl.href = "#";
-					editBTNEl.onclick = ()=>{showEdit(data["id"], data["uuid"]);}
-					editBTNEl.innerHTML = "edit";
-
-					let deleteBTNEl = document.createElement("a");
-					deleteBTNEl.classList.add("material-icons")
-					deleteBTNEl.classList.add("deleteBTN");
-					deleteBTNEl.href = "#";
-					deleteBTNEl.onclick = ()=>{deleteMSG(data["id"], data["uuid"]);}
-					deleteBTNEl.innerHTML = "delete";
-
-					optionsEl.append(editBTNEl);
-					optionsEl.append(deleteBTNEl);
-
-					messageWrapper.append(optionsEl);
-				}
-				
-				messageBoardEl.append(messageWrapper);
-
-				// `<div class="message" data-msgid="${data["id"]}" data-uuid="${data["uuid"]}"><p><span class="time">[${ftime}]</span>&nbsp;${sanetize(data["msg"])}</p>`+
-					// (data["uuid"] == uuid? `
-					// <span class='options'>
-					// 	<a name='edit' href='#' onclick='showEdit("${data["id"]}", "${data["uuid"]}")'>
-					// 		<span class='material-icons editBTN'>edit</span>
-					// 	</a>
-					// 	<a name='delete' href='#' onclick='deleteMSG("${data["id"]}", "${data["uuid"]}");'>
-					// 		<span class='material-icons deleteBTN'>delete</span>
-					// 	</a>
-					// </span>`:'')+'</div>';
-				messageBoardEl.scrollTop = messageBoardEl.scrollHeight;
-				break;
-			case "edit":
-				let editEl = document.querySelector(`data-msgid="${data["id"]}"`);
-				el.innerHTML = sanetize(data["msg"]);
-				break;
-		
-			case "delete":
-				let deleteEl = document.querySelector(`[data-msgid="${data["id"]}"]`);
-				deleteEl.remove();
-				break;
-		}
+		renderMessage(JSON.parse(e.data));
 	};
 };
 
-messageBoardEl.scrollTop = messageBoardEl.scrollHeight;
-window.onload = ()=>{messageBoardEl.scrollTop = messageBoardEl.scrollHeight;}
+window.onload = ()=>{
+	for(i in initMessages){
+		initMessages[i]["action"] = "send";
+		console.log(initMessages[i]);
+		renderMessage(initMessages[i]);
+	}
+	messageBoardEl.scrollTop = messageBoardEl.scrollHeight;
+}
