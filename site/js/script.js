@@ -23,12 +23,18 @@ function sendForm(form){
 }
 
 function deleteMSG(id, uuid){
-	deleteElementIdEl.value = id;
-	deleteUUIDInputEl.value = uuid;
-	sendForm(deleteFormEl);
+	if (socket.readyState === WebSocket.OPEN){
+		deleteIDInputEl.value = id;
+		deleteUUIDInputEl.value = uuid;
+		sendForm(deleteFormEl);
+	}else{
+		deleteIDInputEl.value = id;
+		deleteUUIDInputEl.value = uuid;
+		deleteFormEl.submit();
+	}
 }
 function showEdit(id, uuid){
-	console.log(id, uuid);
+	// console.log(id, uuid);
 	editIDInputEl.value = id;
 	editUUIDInputEl.value = uuid;
 	editFormWrapperEl.style.display = "flex";
@@ -42,11 +48,9 @@ function sanetize(s){
 
 function renderMessage(data){
 	// let data = JSON.parse(rawdata);
-	console.log(data);
-	// console.log(uuid, data["uuid"], data["uuid"] == uuid)
+	// console.log(data);
 	switch (data["action"]) {
 		case "send":
-			console.log(data);
 			let messageWrapper = document.createElement("div");
 			messageWrapper.classList.add("messageWrapper");
 			messageWrapper.dataset.msgid = data["id"];
@@ -96,7 +100,6 @@ function renderMessage(data){
 			break;
 		case "edit":
 			let elToBeedited = document.getElementById(`msg${data["id"]}`);
-			console.log(elToBeedited);
 			elToBeedited.innerHTML = sanetize(data["msg"]);
 			break;
 	
@@ -108,6 +111,7 @@ function renderMessage(data){
 }
 
 socket.onopen = () => {
+	socket.send(JSON.stringify({"uuid":uuid}));
 	connectionInfoEL.innerHTML += "Connected!";
 	connectionInfoEL.style.backgroundColor = "green";
 	connectionInfoEL.style.display = "";
@@ -116,21 +120,16 @@ socket.onopen = () => {
 		connectionInfoEL.innerHTML = "Disconnected :(";
 		connectionInfoEL.style.backgroundColor = "red";
 		Array.from(document.forms).map(e=>{e.onsubmit = null});
-		deleteMSG = ()=>{
-			deleteElementIdEl.value = id;
-			deleteUUIDInputEl.value = uuid;
-			deleteFormEl.submit();
-		}
 	}
 	sendFormEl.onsubmit = (e) => {
 		e.preventDefault();
-		sendMSGInputEl.value = "";
 		sendForm(e.target);
+		sendMSGInputEl.value = "";
 	}
 	editFormEl.onsubmit = (e) => {
 		e.preventDefault();
-		editMSGInputEl.value = "";
 		sendForm(e.target);
+		editMSGInputEl.value = "";
 	}
 	
 	socket.onmessage = (e) => {
@@ -141,7 +140,6 @@ socket.onopen = () => {
 window.onload = ()=>{
 	for(i in initMessages){
 		initMessages[i]["action"] = "send";
-		console.log(initMessages[i]);
 		renderMessage(initMessages[i]);
 	}
 	messageBoardEl.scrollTop = messageBoardEl.scrollHeight;
