@@ -26,7 +26,7 @@ async def handler(websocket):
 
 				if data["request"] == "send":
 					if len(data["message"]) != 0:
-						cursor.execute("""INSERT INTO messages (message, user) VALUES (%s, %s)""", [str(data["message"]), str(data["uuid"])])
+						cursor.execute("""INSERT INTO messages (msg, uuid) VALUES (%s, %s)""", [str(data["message"]), str(data["uuid"])])
 						conn.commit()
 						messageId = cursor.lastrowid
 						unixtime = round(time.time() * 1000)
@@ -43,11 +43,11 @@ async def handler(websocket):
 							sendtTo.append(colored(i.remote_address[0], "cyan"))
 						print(colored("Sendt to", "green"), colored(", ", "green").join(sendtTo))
 				elif data["request"] == "edit":
-					cursor.execute("""SELECT User FROM messages WHERE id = %d""", [Number(data["elementid"])])
+					cursor.execute("""SELECT uuid FROM messages WHERE id = %d""", [Number(data["elementid"])])
 					conn.commit()
 					ress = cursor.fetchone()
 					if ress[0] == data["uuid"]:
-						cursor.execute("""UPDATE messages SET message = %s where id = %d""", [str(data["message"]), str(data["elementid"])])
+						cursor.execute("""UPDATE messages SET msg = %s where id = %d""", [str(data["message"]), str(data["elementid"])])
 						conn.commit()
 						sendData = {
 							"action":"edit",
@@ -57,7 +57,7 @@ async def handler(websocket):
 						for i in connections: await i.send(json.dumps(sendData))
 						print(userIP, colored("Edited", "blue"), data["elementid"])
 				elif data["request"] == "delete":
-					cursor.execute("""SELECT User FROM messages WHERE id = %s""", [str(data["elementid"])])
+					cursor.execute("""SELECT uuid FROM messages WHERE id = %s""", [str(data["elementid"])])
 					conn.commit()
 					ress = cursor.fetchone()
 					if ress[0] == data["uuid"]:

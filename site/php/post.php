@@ -11,7 +11,7 @@
             case 'send':
                 if (isset($_POST["message"]) and isset($_SESSION["uuid"]) and strlen(trim($_POST["message"]))>0){
                     // SQL-Injection proof SQL query
-                    $stmt = $con->prepare('INSERT into messages (message, user) VALUES (?, ?)');
+                    $stmt = $con->prepare('INSERT into messages (msg, uuid) VALUES (?, ?)');
                     $stmt->bind_param('ss', $_POST["message"], $_SESSION["uuid"]); // 's' specifies the variable type => 'string'
                     $stmt->execute();
                 }
@@ -20,7 +20,7 @@
             case 'edit':
                 if (isset($_POST["message"]) and isset($_POST["elementid"]) and isset($_SESSION["uuid"]) and ($_POST["uuid"] == $_SESSION["uuid"]) and strlen(trim($_POST["message"]))>0){
                     // SQL-Injection proof SQL query
-                    $stmt = $con->prepare('UPDATE messages SET message = ? where id = ?');
+                    $stmt = $con->prepare('UPDATE messages SET msg = ? where id = ?');
                     $stmt->bind_param('si', $_POST["message"], $_POST["elementid"]); // 's' specifies the variable type => 'string'
                     $stmt->execute();
                 }
