@@ -9,19 +9,19 @@
 
         switch ($_POST["request"]) {
             case 'send':
-                if (isset($_POST["message"]) and isset($_SESSION["uuid"]) and strlen(trim($_POST["message"]))>0){
+                if (isset($_POST["msg"]) and isset($_SESSION["uuid"]) and strlen(trim($_POST["msg"]))>0){
                     // SQL-Injection proof SQL query
                     $stmt = $con->prepare('INSERT into messages (msg, uuid) VALUES (?, ?)');
-                    $stmt->bind_param('ss', $_POST["message"], $_SESSION["uuid"]); // 's' specifies the variable type => 'string'
+                    $stmt->bind_param('ss', $_POST["msg"], $_SESSION["uuid"]); // 's' specifies the variable type => 'string'
                     $stmt->execute();
                 }
                 break;
 
             case 'edit':
-                if (isset($_POST["message"]) and isset($_POST["elementid"]) and isset($_SESSION["uuid"]) and ($_POST["uuid"] == $_SESSION["uuid"]) and strlen(trim($_POST["message"]))>0){
+                if (isset($_POST["msg"]) and isset($_POST["id"]) and isset($_SESSION["uuid"]) and ($_POST["uuid"] == $_SESSION["uuid"]) and strlen(trim($_POST["msg"]))>0){
                     // SQL-Injection proof SQL query
                     $stmt = $con->prepare('UPDATE messages SET msg = ? where id = ?');
-                    $stmt->bind_param('si', $_POST["message"], $_POST["elementid"]); // 's' specifies the variable type => 'string'
+                    $stmt->bind_param('si', $_POST["msg"], $_POST["id"]); // 's' specifies the variable type => 'string'
                     $stmt->execute();
                 }
                 break;
@@ -30,7 +30,7 @@
                 if ($_POST["uuid"] == $_SESSION["uuid"]){
                     // SQL-Injection proof SQL query
                     $stmt = $con->prepare('DELETE from messages where id = ?');
-                    $stmt->bind_param('i', $_POST["elementid"]); // 'i' specifies the variable type => 'int'
+                    $stmt->bind_param('i', $_POST["id"]); // 'i' specifies the variable type => 'int'
                     $stmt->execute();
                 }
                 break;
