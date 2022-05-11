@@ -59,6 +59,7 @@ function renderMessage(data){
 			timeEl.innerHTML = `[${ftime}]`;
 
 			let msgEl = document.createElement("span");
+			msgEl.classList.add("msg");
 			msgEl.id = `msg${data["id"]}`;
 			msgEl.innerHTML = sanetize(data["msg"]);
 
