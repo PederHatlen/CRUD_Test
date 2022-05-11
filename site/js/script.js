@@ -3,36 +3,34 @@ let messageBoardEl = document.getElementById("messageBoard");
 let socket = new WebSocket("ws://" + window.location.host + ":5678?");
 let connectionInfoEL = document.getElementById("connectionInfo");
 
-let sendMSGFormEl = document.getElementById("sendMSG");
-let sendMessageInnputEl = document.getElementById("sendMessage");
+let sendFormEl = document.getElementById("sendMSG");
+let sendMSGInputEl = document.getElementById("sendMessage");
 
-let editMSGFormEl = document.getElementById("editMSG");
-
+let editFormEl = document.getElementById("editMSG");
 let editFormWrapperEl = document.getElementById("editFormWrapper");
-let editElementIdEl = document.getElementById("editElementId");
-let editElementUUIDEl = document.getElementById("editElementUUID");
-let editElementMessageEl = document.getElementById("editMessage");
+let editIDInputEl = document.getElementById("editElementId");
+let editUUIDInputEl = document.getElementById("editElementUUID");
+let editMSGInputEl = document.getElementById("editMessage");
 
-let deleteMSGFormEl = document.getElementById("deleteMSG");
-let deleteElementIdEl = document.getElementById("deleteElementId");
-let deleteElementUUIDEl = document.getElementById("deleteElementUUID");
+let deleteFormEl = document.getElementById("deleteMSG");
+let deleteIDInputEl = document.getElementById("deleteElementId");
+let deleteUUIDInputEl = document.getElementById("deleteElementUUID");
 
 function sendForm(form){
 	const data = new FormData(form);
 	const json = JSON.stringify(Object.fromEntries(data.entries()));
-	// console.log(json);
 	socket.send(json);
 }
 
 function deleteMSG(id, uuid){
 	deleteElementIdEl.value = id;
-	deleteElementUUIDEl.value = uuid;
-	sendForm(deleteMSGFormEl);
+	deleteUUIDInputEl.value = uuid;
+	sendForm(deleteFormEl);
 }
 function showEdit(id, uuid){
 	console.log(id, uuid);
-	editElementIdEl.value = id;
-	editElementUUIDEl.value = uuid;
+	editIDInputEl.value = id;
+	editUUIDInputEl.value = uuid;
 	editFormWrapperEl.style.display = "flex";
 }
 
