@@ -25,7 +25,7 @@ async def handler(websocket):
 				data = json.loads(await websocket.recv())
 
 				if data["request"] == "send":
-					if len(data["msg"]) != 0:
+					if "msg" in data and len(data["msg"]) != 0:
 						cursor.execute("""INSERT INTO messages (msg, uuid) VALUES (%s, %s)""", [str(data["msg"]), str(data["uuid"])])
 						conn.commit()
 						messageId = cursor.lastrowid
@@ -42,8 +42,9 @@ async def handler(websocket):
 							await i.send(json.dumps(sendData))
 							sendtTo.append(colored(i.remote_address[0], "cyan"))
 						print(colored("Sendt to", "green"), colored(", ", "green").join(sendtTo))
+					else:
+						print(userIP, colored("Not enought data", "red"))
 				elif data["request"] == "edit":
-					print(data)
 					cursor.execute("""SELECT uuid FROM messages WHERE id = %s""", [str(data["id"])])
 					conn.commit()
 					ress = cursor.fetchone()
@@ -70,8 +71,7 @@ async def handler(websocket):
 						}
 						for i in connections: await i.send(json.dumps(sendData))
 						print(userIP, colored("Deleted", "blue"), data["id"])
-			except websockets.exceptions.ConnectionClosed:
-				break
+			except websockets.exceptions.ConnectionClosed: break
 			except Exception as err:
 				print(userIP, colored("Something went wrong:", "red"), err)
 				break
