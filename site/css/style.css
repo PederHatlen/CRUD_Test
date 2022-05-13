@@ -44,17 +44,22 @@ h1{
     padding: 0 20px;
 }
 .messageWrapper{
+    min-height: 28px;
     display: flex;
     flex-direction: row;
-    align-items: baseline;
+    align-items: center;
 }
 .time{
     font-family: Arial, Helvetica, sans-serif;
     font-weight: bold;
     font-size: 1rem;
 }
-.msg{padding: 0 5px;}
+.msg{
+    padding: 0 5px;
+    overflow-wrap: anywhere;
+}
 .options{margin-left: auto;}
+.material-icons{font-size: 1.5rem !important;}
 .deleteBTN, .editBTN{color: white; text-decoration: none;}
 .deleteBTN:hover{color: #FC300D;}
 .editBTN:hover{color: #BB0DFC}

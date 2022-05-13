@@ -59,7 +59,7 @@ function renderMessage(data){
 
 			let timeEl = document.createElement("span");
 			let time = new Date(data["time"]);
-			let ftime = ('00'+time.getDate()).slice(-2)+"."+('00'+(time.getMonth()+1)).slice(-2)+" "+('00'+time.getHours()).slice(-2)+":"+('00'+time.getMinutes()).slice(-2);
+			let ftime = ('00'+time.getDate()).slice(-2)+"."+('00'+(time.getMonth()+1)).slice(-2)+"&nbsp;"+('00'+time.getHours()).slice(-2)+":"+('00'+time.getMinutes()).slice(-2);
 			timeEl.classList.add("time");
 			timeEl.innerHTML = `[${ftime}]`;
 
