@@ -1,13 +1,21 @@
 import asyncio
 import time
 import socket
-from tokenize import Number
 import websockets
 import json
 import MySQLdb
 from termcolor import colored
 
 connections = []
+
+# Colored output Table
+# IP			=	cyan
+# Client	 	=	magenta
+# Server		=	yellow
+# Error/Discon	=	red
+# Success		=	green
+# Info			=	blue
+# id			=	white
 
 async def handler(websocket):
 	userIP = colored("[{0}]".format(websocket.remote_address[0]), "magenta")
@@ -56,7 +64,7 @@ async def handler(websocket):
 						for i in connections:
 							await i.send(json.dumps(sendData))
 							sendtTo.append(colored(i.remote_address[0], "cyan"))
-						print(colored("Sendt to", "green"), colored(", ", "green").join(sendtTo))
+						print(colored("MSG from", "blue"), userIP, colored("Sendt to", "blue"), colored(", ", "blue").join(sendtTo))
 					else:
 						print(userIP, colored("Not enought data", "red"))
 				elif data["request"] == "edit":
@@ -72,7 +80,7 @@ async def handler(websocket):
 							"id": data["id"]
 						}
 						for i in connections: await i.send(json.dumps(sendData))
-						print(userIP, colored("Edited", "blue"), data["id"])
+						print(userIP, colored("Edited", "blue"), colored(data["id"],"white"))
 				elif data["request"] == "delete":
 					cursor.execute("""SELECT uuid FROM messages WHERE id = %s""", [str(data["id"])])
 					conn.commit()
@@ -85,7 +93,7 @@ async def handler(websocket):
 							"id": data["id"]
 						}
 						for i in connections: await i.send(json.dumps(sendData))
-						print(userIP, colored("Deleted", "blue"), data["id"])
+						print(userIP, colored("Deleted", "blue"), colored(data["id"],"white"))
 			except websockets.exceptions.ConnectionClosed: break
 			except Exception as err:
 				print(userIP, colored("Something went wrong:", "red"), err)
@@ -101,16 +109,16 @@ async def handler(websocket):
 	
 
 async def main():
-	global conversations
+	global connections
 	global conn
 	global cursor
 
 	try: conn = MySQLdb.connect("localhost", "root", "", "crud")
 	except: 
-		print(colored("Can't connect to database.", "red"))
+		print(colored("-- Can't connect to database. --", "red"))
 		return False
 	else: 
-		print(colored("Connection to database was succesfull!", "green"))
+		print(colored("-- Connection to database was succesfull! --", "green"))
 	cursor = conn.cursor()
 
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -125,4 +133,8 @@ async def main():
 	conn.close()
 
 if __name__ == "__main__":
-	asyncio.run(main())
+	try: 
+		asyncio.run(main())
+	except KeyboardInterrupt:
+		print(colored("-- Keyboard interupt triggered --", "yellow"))
+		conn.close()
