@@ -28,13 +28,15 @@ async def handler(websocket):
 			await websocket.close()
 			return False
 
-		cursor.execute("""SELECT ip FROM users WHERE uuid = %s and ip = %s """, [str(initData["uuid"]), str(websocket.remote_address[0])])
+		cursor.execute("""SELECT ip, color FROM users WHERE uuid = %s and ip = %s """, [str(initData["uuid"]), str(websocket.remote_address[0])])
 		conn.commit()
 
 		if not cursor.rowcount:
 			print(userIP, colored("IP does not match UUID.", "red"))
 			await websocket.close()
 			return False
+
+		color = cursor.fetchone()[1]
 
 		print(userIP, colored("Connected", "green"))
 		connections.append(websocket)
@@ -59,7 +61,8 @@ async def handler(websocket):
 							"time": unixtime,
 							"uuid": data["uuid"],
 							"msg": data["msg"],
-							"id": messageId
+							"id": messageId,
+							"color": color
 						}
 						for i in connections:
 							await i.send(json.dumps(sendData))

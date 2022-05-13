@@ -5,7 +5,7 @@
 	$con = connect();
 
 	// SQL-Injection proof SQL query
-	$stmt = $con->prepare('SELECT * FROM  messages');
+	$stmt = $con->prepare('SELECT messages.id, messages.msg, messages.uuid, messages.time, users.color FROM  messages LEFT JOIN users on messages.uuid = users.uuid');
 	$stmt->execute();
 	$messages = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 

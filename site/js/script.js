@@ -55,6 +55,7 @@ function renderMessage(data){
 			messageWrapper.classList.add("messageWrapper");
 			messageWrapper.dataset.msgid = data["id"];
 			messageWrapper.dataset.uuid = data["uuid"];
+			messageWrapper.style.color = data["color"];
 
 			let timeEl = document.createElement("span");
 			let time = new Date(data["time"]);

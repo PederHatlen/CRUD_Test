@@ -4,7 +4,8 @@ use crud;
 
 create table users(
     uuid varchar(255) not null primary key,
-    ip varchar(15) not null
+    ip varchar(15) not null,
+    color varchar(7) not null
 );
 
 create table messages(

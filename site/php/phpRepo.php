@@ -11,9 +11,11 @@
 
 		$con = connect();
 
+		$color = randomColor();
+
 		// SQL-Injection proof SQL query
-		$stmt = $con->prepare('INSERT into users (uuid, ip) VALUES (?, ?)');
-		$stmt->bind_param('ss', $_SESSION["uuid"], $_SERVER["REMOTE_ADDR"]); // 's' specifies the variable type => 'string'
+		$stmt = $con->prepare('INSERT into users (uuid, ip, color) VALUES (?, ?, ?)');
+		$stmt->bind_param('sss', $_SESSION["uuid"], $_SERVER["REMOTE_ADDR"], $color); // 's' specifies the variable type => 'string'
 		$stmt->execute();
 
 		$con->close();
@@ -36,4 +38,6 @@
 	
 		return $con;
 	}
+
+	function randomColor(){return sprintf('#%06X', mt_rand(0, 0xFFFFFF));}
 ?>
